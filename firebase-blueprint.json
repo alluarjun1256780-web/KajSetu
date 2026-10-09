@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "Task": {
+      "title": "Task",
+      "description": "Micro-task available on the KajSetu platform",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique task identifier" },
+        "title": { "type": "string", "description": "Title of the micro-task" },
+        "description": { "type": "string", "description": "Detailed description of the task" },
+        "rewardAmount": { "type": "number", "description": "Reward in BDT for task completion" },
+        "deadline": { "type": "string", "description": "Deadline string or date for the task" },
+        "category": { "type": "string", "description": "Category such as Social Media, Survey, etc." },
+        "taskUrl": { "type": "string", "description": "Target URL to complete the task" },
+        "instructions": { "type": "string", "description": "Step-by-step instructions" },
+        "maxSubmissions": { "type": "integer", "description": "Maximum number of allowed submissions" },
+        "currentSubmissions": { "type": "integer", "description": "Current number of approved submissions" },
+        "proofType": { "type": "string", "description": "Type of proof required" },
+        "status": { "type": "string", "description": "Status: ACTIVE, PAUSED, COMPLETED" },
+        "createdBy": { "type": "string", "description": "Admin UID who created the task" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update" }
+      },
+      "required": ["id", "title", "description", "rewardAmount", "status", "createdBy", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile in KajSetu",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User ID matching auth UID" },
+        "username": { "type": "string", "description": "Unique username" },
+        "fullName": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "description": "User email address" },
+        "role": { "type": "string", "description": "Role: user or admin" },
+        "accountStatus": { "type": "string", "description": "Status: active, inactive, suspended" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of registration" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last profile update" }
+      },
+      "required": ["id", "username", "fullName", "email", "role", "accountStatus", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Micro-tasks published on the platform"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account profiles"
+    }
+  }
+}

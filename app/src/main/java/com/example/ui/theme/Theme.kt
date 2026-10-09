@@ -1,0 +1,58 @@
+package com.example.ui.theme
+
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val LightColorScheme = lightColorScheme(
+  primary = BluePrimary,
+  onPrimary = Color.White,
+  primaryContainer = BlueLightBg,
+  onPrimaryContainer = BluePrimaryDark,
+  secondary = EmeraldGreen,
+  onSecondary = Color.White,
+  secondaryContainer = EmeraldGreenBg,
+  onSecondaryContainer = EmeraldGreenDark,
+  tertiary = AmberGold,
+  onTertiary = Color.White,
+  tertiaryContainer = AmberGoldBg,
+  onTertiaryContainer = Color(0xFF78350F),
+  background = SlateBackground,
+  onBackground = TextPrimary,
+  surface = SurfaceCard,
+  onSurface = TextPrimary,
+  surfaceVariant = Color(0xFFF1F5F9),
+  onSurfaceVariant = TextSecondary,
+  outline = CardBorder,
+  error = RedError,
+  onError = Color.White,
+  errorContainer = RedBg,
+  onErrorContainer = Color(0xFF991B1B)
+)
+
+@Composable
+fun KajSetuTheme(
+  content: @Composable () -> Unit
+) {
+  val view = LocalView.current
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as? Activity)?.window
+      if (window != null) {
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+      }
+    }
+  }
+
+  MaterialTheme(
+    colorScheme = LightColorScheme,
+    typography = Typography,
+    content = content
+  )
+}

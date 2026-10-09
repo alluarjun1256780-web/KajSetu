@@ -1,0 +1,6 @@
+{
+  "name": "KajSetu",
+  "description": "কাজসেতু - স্মার্ট ডিজিটাল আয় ও মাইক্রো টাস্ক প্ল্যাটফর্ম। কাজ করুন, আয় করুন, নিরাপদে এগিয়ে যান।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

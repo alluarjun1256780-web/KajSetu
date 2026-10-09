@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'admin@kajsetu.com' ||
+        request.auth.token.email == 'neymarjrfan337@gmail.com' ||
+        (request.auth.token.keys().hasAll(['admin']) && request.auth.token.admin == true) ||
+        (request.auth.token.keys().hasAll(['role']) && request.auth.token.role == 'admin')
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidTask(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+             data.title is string && data.title.size() >= 2 && data.title.size() <= 200 &&
+             data.description is string && data.description.size() <= 2000 &&
+             data.rewardAmount is number && data.rewardAmount >= 0 &&
+             data.status in ['ACTIVE', 'PAUSED', 'COMPLETED'] &&
+             data.createdBy is string && data.createdBy.size() > 0 &&
+             (!('deadline' in data) || (data.deadline is string && data.deadline.size() <= 100)) &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+             (!('taskUrl' in data) || (data.taskUrl is string && data.taskUrl.size() <= 1000)) &&
+             (!('instructions' in data) || (data.instructions is string && data.instructions.size() <= 2000)) &&
+             (!('maxSubmissions' in data) || (data.maxSubmissions is int && data.maxSubmissions >= 0)) &&
+             (!('currentSubmissions' in data) || (data.currentSubmissions is int && data.currentSubmissions >= 0)) &&
+             (!('proofType' in data) || (data.proofType is string && data.proofType.size() <= 200)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidUserProfile(data) {
+      return data.id is string && data.id == request.auth.uid &&
+             data.username is string && data.username.size() >= 2 && data.username.size() <= 50 &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 150 &&
+             data.role in ['user', 'admin'] &&
+             data.accountStatus in ['active', 'inactive', 'suspended'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isSignedIn() && isOwner(userId) && isValidUserProfile(request.resource.data);
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin()) && isValidUserProfile(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /tasks/{taskId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() &&
+                    isValidId(taskId) &&
+                    (request.resource.data.createdBy == request.auth.uid || isAdmin()) &&
+                    isValidTask(request.resource.data);
+      allow update: if isSignedIn() &&
+                    isValidId(taskId) &&
+                    (resource.data.createdBy == request.auth.uid || isAdmin()) &&
+                    isValidTask(request.resource.data);
+      allow delete: if isSignedIn() &&
+                    isValidId(taskId) &&
+                    (resource.data.createdBy == request.auth.uid || isAdmin());
+    }
+  }
+}
